@@ -7,14 +7,14 @@ HEIGHT = int(sys.argv[3])
 DEPTH  = int(sys.argv[4])
 specs = (
     ('e1', 'v4l2src', [('device', DEVICE), ]),
-    ('e2', 'ffmpegcolorspace', []),
-    ('e3', 'videoscale', []),
+    ('e2', 'ffmpegcolorspace'),
+    ('e3', 'videoscale'),
     ('e4', 'capsfilter', [
             ('caps',
              'video/x-raw-yuv,width=%s,height=%s,bpp=%s'%(
                     WIDTH, HEIGHT, DEPTH*8)),
             ]),
-    ('e5', 'xvimagesink', []),
+    ('e5', 'xvimagesink'),
     )
 pipe, elements, args = gstwrap.create(specs)
 print(args)

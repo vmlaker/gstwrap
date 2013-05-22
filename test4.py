@@ -24,14 +24,14 @@ def onVideoBuffer(pad, idata):
 
 specs = (
     ('e1', 'v4l2src', [('device', DEVICE), ]),
-    ('e2', 'ffmpegcolorspace', []),
-    ('e3', 'videoscale', []),
+    ('e2', 'ffmpegcolorspace'),
+    ('e3', 'videoscale'),
     ('e4', 'capsfilter', [
             ('caps',
              'video/x-raw-rgb,width=%s,height=%s,bpp=%s'%(
                     WIDTH, HEIGHT, DEPTH*8)),
             ]),
-    ('e5', 'fakesink', []),
+    ('e5', 'fakesink'),
     )
 pipe, elements, args = gstwrap.create(specs)
 

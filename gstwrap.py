@@ -10,10 +10,10 @@ gobject.threads_init()
 
 
 def create(specs):
-    """Given a tuple or list of GStreamer specifications, each
-    spec having three elements of format,
+    """Given an iterable of GStreamer specifications, each
+    specification having two or three elements of format:
        (name, gst_element, properties)
-    return three values:
+    where properties is optional, return three values:
        1) GStreamer pipeline
        2) dictionary of GStreamer elements
        3) string of GStreamer launch arguments
@@ -23,10 +23,13 @@ def create(specs):
     pipeline = gst.Pipeline('hello')
     prev_element = None
     elements = dict()
-    launch_args = ''
-    for ekey, etype, eprops in specs:
-        ename = '%s'%ekey
-        element = gst.element_factory_make(etype, ename)
+    launch_args = ''  # Assemble a string for command line.
+    for spec in specs:
+        ekey = spec[0]
+        etype = spec[1]
+        try: eprops = spec[2]
+        except: eprops = tuple()
+        element = gst.element_factory_make(etype, '%s'%ekey)
         for ptype, pvalue in eprops:
             if ptype == 'caps':
                 pvalue = gst.Caps(pvalue)

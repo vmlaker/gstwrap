@@ -1,8 +1,8 @@
 import gst
 import gstwrap
 specs = (
-    ('e1', 'v4l2src', []),
-    ('e2', 'xvimagesink', []),
+    ('e1', 'v4l2src'),
+    ('e2', 'xvimagesink'),
     )
 pipe, elements, args = gstwrap.create(specs)
 print(args)
