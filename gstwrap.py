@@ -8,45 +8,52 @@ import gst
 import gobject
 gobject.threads_init()  
 
+class Element(object):
 
-def create(specs):
-    """Given an iterable of GStreamer specifications, each
-    specification having two or three elements of format:
-       (name, gst_element, properties)
-    where properties is optional, return three values:
-       1) GStreamer pipeline
-       2) dictionary of GStreamer elements
-       3) string of GStreamer launch arguments
-    """
-    
-    # Create pipeline and elements.
-    pipeline = gst.Pipeline('hello')
-    prev_element = None
-    elements = dict()
-    launch_args = ''  # Assemble a string for command line.
-    for spec in specs:
-        ekey = spec[0]
-        etype = spec[1]
-        try: eprops = spec[2]
-        except: eprops = tuple()
-        element = gst.element_factory_make(etype, '%s'%ekey)
-        for ptype, pvalue in eprops:
+    index = -1
+
+    def __init__(self, type, props=tuple(), name=''):
+        Element.index += 1
+        self._gst_element = gst.element_factory_make(
+            type, 
+            '%s%d'%(name, Element.index),
+            )
+        self._cmd_string = '%s '%type
+        for ptype, pval in props:
             if ptype == 'caps':
-                pvalue = gst.Caps(pvalue)
-            element.set_property(ptype, pvalue)
-        pipeline.add(element)
-        elements[ekey] = element
+                pval = gst.Caps(pval)
+            self._gst_element.set_property(ptype, pval)
+            self._cmd_string += ' %s="%s" '%(ptype, pval)
 
-        # Link this element to the previous element.
-        if prev_element:
-            prev_element.link(element)
-        prev_element = element
+    def link(self, other):
+        self._gst_element.link(other._gst_element)
 
-        # Append to the launch auguments string.
-        if launch_args:
-            launch_args += ' ! '
-        launch_args += '%s '%etype
-        for prop in eprops:
-            launch_args += ' %s=%s '%(prop[0], prop[1])
+    def addTo(self, gst_pipeline):
+        gst_pipeline.add(self._gst_element)
 
-    return pipeline, elements, launch_args
+    def addSinkProbe(self, func):
+        pad = next(self._gst_element.sink_pads())
+        pad.add_buffer_probe(func)
+
+    def __str__(self):
+        return self._cmd_string
+
+class Pipeline(object):
+
+    def __init__(self, name=''):
+        self._gst_pipeline = gst.Pipeline(name)
+        self._count = 0
+        self._cmd_string = ''
+
+    def start(self):
+        self._gst_pipeline.set_state(gst.STATE_PLAYING)
+
+    def add(self, element):
+        element.addTo(self._gst_pipeline)
+        if self._count:
+            self._cmd_string += '! '
+        self._count += 1
+        self._cmd_string += str(element)
+
+    def __str__(self):
+        return self._cmd_string

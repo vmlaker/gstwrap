@@ -3,9 +3,8 @@
 import sys
 import numpy as np
 import cv2
-import gst
 
-import gstwrap
+from gstwrap import Element, Pipeline
 
 DEVICE = sys.argv[1]
 WIDTH  = int(sys.argv[2])
@@ -22,21 +21,25 @@ def onVideoBuffer(pad, idata):
     cv2.imshow('output', image)
     cv2.waitKey(1)
 
-specs = (
-    ('e1', 'v4l2src', [('device', DEVICE), ]),
-    ('e2', 'ffmpegcolorspace'),
-    ('e3', 'videoscale'),
-    ('e4', 'capsfilter', [
+elements = [
+    Element('v4l2src', [('device', DEVICE), ]),
+    Element('ffmpegcolorspace'),
+    Element('videoscale'),
+    Element('capsfilter', [
             ('caps',
              'video/x-raw-rgb,width=%s,height=%s,bpp=%s'%(
                     WIDTH, HEIGHT, DEPTH*8)),
             ]),
-    ('e5', 'fakesink'),
-    )
-pipe, elements, args = gstwrap.create(specs)
+    Element('fakesink'),
+    ]
 
-pad = next(elements['e5'].sink_pads())
-pad.add_buffer_probe(onVideoBuffer)
+pipe = Pipeline()
+for index in range(len(elements)):
+    pipe.add(elements[index])
+    if index:
+        elements[index-1].link(elements[index])
 
-pipe.set_state(gst.STATE_PLAYING)
+elements[-1].addSinkProbe(onVideoBuffer)
+print(pipe)
+pipe.start()
 raw_input('Hit <enter> to stop.')
