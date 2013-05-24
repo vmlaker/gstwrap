@@ -1,7 +1,7 @@
 gstwrap
 =======
 
-Easy GStreamer in Python.
+Wrapper of ``gst`` module.
 
 Software requirements
 ---------------------
@@ -23,6 +23,5 @@ python test1.py
 python test2.py
 python test3.py /dev/video0 640 480 3
 python test4.py /dev/video0 640 480 3
+python test5.py
 ```
- 
-Enjoy!
