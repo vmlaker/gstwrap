@@ -1,12 +1,6 @@
-"""Helper code for gst module."""
+"""Wrapper for gst module."""
 
 import gst
-
-# When using this module in a multi-thread/process program,
-# need to initialize Python threading in gobject module first.
-# Let's just do this always.
-import gobject
-gobject.threads_init()  
 
 class Element(object):
 
