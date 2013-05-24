@@ -4,6 +4,11 @@ import sys
 import numpy as np
 import cv2
 
+# We'll be using OpenCV window for display. This runs an additional
+# thread, so we need to initialize Python threading in gobject module.
+import gobject
+gobject.threads_init()  
+
 from gstwrap import Element, Pipeline
 
 DEVICE = sys.argv[1]
