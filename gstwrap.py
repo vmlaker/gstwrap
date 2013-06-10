@@ -15,17 +15,17 @@ class Element(object):
         Element.index += 1
         self._gst_element = gst.element_factory_make(
             type, 
-            '%s%d'%(name, Element.index),
+            '{:s}{:d}'.format(name, Element.index),
             )
 
         # Maintain command-line string representation.
-        self._cmd_string = '%s '%type
+        self._cmd_string = '{:s} '.format(type)
 
         for ptype, pval in props:
             if ptype == 'caps':
                 pval = gst.Caps(pval)
             self._gst_element.set_property(ptype, pval)
-            self._cmd_string += '%s="%s" '%(ptype, pval)
+            self._cmd_string += '{:s}="{:s}" '.format(ptype, pval)
 
     def link(self, other):
         self._gst_element.link(other._gst_element)
