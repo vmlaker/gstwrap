@@ -6,17 +6,14 @@ import gst
 class Element(object):
     """Wrapper of gst.Element class."""
 
-    index = -1  # Maintain object count (index+1).
+    index = -1  # Maintain global zero-based object index.
 
-    def __init__(self, type, props=tuple(), name=''):
+    def __init__(self, type, props=tuple()):
         """Initialize the object."""
 
         # Create the wrapped gst.Element object.
         Element.index += 1
-        self._gst_element = gst.element_factory_make(
-            type, 
-            '{:s}{:d}'.format(name, Element.index),
-            )
+        self._gst_element = gst.element_factory_make(type, str(Element.index))
 
         # Maintain command-line string representation.
         self._cmd_string = '{:s} '.format(type)
@@ -45,11 +42,11 @@ class Element(object):
 class Pipeline(object):
     """Wrapper of gst.Pipeline class."""
 
-    def __init__(self, name=''):
+    def __init__(self):
         """Initialize the object."""
 
         # The wrapped gst.Pipeline object.
-        self._gst_pipeline = gst.Pipeline(name)
+        self._gst_pipeline = gst.Pipeline()
 
         # Maintain count of elements.
         self._count = 0
